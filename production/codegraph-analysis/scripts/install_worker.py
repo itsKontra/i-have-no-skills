@@ -50,8 +50,8 @@ def main() -> int:
         "--project",
         action="store_true",
         help=(
-            "Install into .agents/skills and .codex/agents in the current project "
-            "instead of the user-wide locations under ~/.agents and ~/.codex."
+            "Install into .agents/skills and .codex/agents (.agents/agents for Gemini) "
+            "in the current project instead of the user-wide locations."
         ),
     )
     parser.add_argument(
@@ -65,36 +65,48 @@ def main() -> int:
     worker_source = skill_root / "assets" / WORKER_NAME
 
     if args.project:
-        skill_destination = Path.cwd() / ".agents" / "skills" / SKILL_NAME
-        worker_destination = Path.cwd() / ".codex" / "agents" / WORKER_NAME
+        skill_destinations = [Path.cwd() / ".agents" / "skills" / SKILL_NAME]
+        worker_destinations = [
+            Path.cwd() / ".codex" / "agents" / WORKER_NAME,
+            Path.cwd() / ".agents" / "agents" / WORKER_NAME,
+        ]
     else:
-        skill_destination = Path.home() / ".agents" / "skills" / SKILL_NAME
-        worker_destination = Path.home() / ".codex" / "agents" / WORKER_NAME
+        skill_destinations = [
+            Path.home() / ".agents" / "skills" / SKILL_NAME,
+            Path.home() / ".gemini" / "config" / "skills" / SKILL_NAME,
+        ]
+        worker_destinations = [
+            Path.home() / ".codex" / "agents" / WORKER_NAME,
+            Path.home() / ".gemini" / "config" / "agents" / WORKER_NAME,
+        ]
 
-    skill_conflict = (
-        skill_destination.exists()
-        and skill_root.resolve() != skill_destination.resolve()
-        and not args.force
-    )
-    worker_conflict = worker_destination.exists() and not args.force
+    for dest in skill_destinations:
+        if dest.exists() and skill_root.resolve() != dest.resolve() and not args.force:
+            print(f"Not overwritten: {dest}")
+            print("Use --force to replace existing files.")
+            return 2
 
-    if skill_conflict or worker_conflict:
-        if skill_conflict:
-            print(f"Not overwritten: {skill_destination}")
-        if worker_conflict:
-            print(f"Not overwritten: {worker_destination}")
-        print("Use --force to replace existing files.")
-        return 2
+    for dest in worker_destinations:
+        if dest.exists() and not args.force:
+            print(f"Not overwritten: {dest}")
+            print("Use --force to replace existing files.")
+            return 2
 
-    skill_ok = copy_skill(skill_root, skill_destination, args.force)
-    worker_ok = copy_file(worker_source, worker_destination, args.force)
+    for dest in skill_destinations:
+        if not copy_skill(skill_root, dest, args.force):
+            return 2
 
-    if not skill_ok or not worker_ok:
-        return 2
+    for dest in worker_destinations:
+        if not copy_file(worker_source, dest, args.force):
+            return 2
 
     print("Installation complete.")
-    print(f"Skill:  {skill_destination}")
-    print(f"Worker: {worker_destination}")
+    print("Skills installed to:")
+    for dest in skill_destinations:
+        print(f"  {dest}")
+    print("Workers installed to:")
+    for dest in worker_destinations:
+        print(f"  {dest}")
     print("Edit model and model_reasoning_effort in the worker TOML to change the worker model.")
     return 0
 

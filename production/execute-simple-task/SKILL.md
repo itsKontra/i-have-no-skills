@@ -138,7 +138,7 @@ Preserve explicit error messages exactly in the returned result.
 
 ## Worker configuration
 
-The worker model is intentionally not configured in this skill. Codex must resolve the custom agent named `simple-task-worker` from its agent configuration.
+The worker model is intentionally not configured in this skill. The main agent resolves the custom agent named `simple-task-worker` from its agent configuration.
 
 Use `scripts/install_worker.py` to install both this skill and the bundled worker profile.
 
@@ -148,10 +148,15 @@ User-wide installation:
 python scripts/install_worker.py
 ```
 
-This installs:
+This installs for Codex:
 
 - `~/.agents/skills/execute-simple-task/`
 - `~/.codex/agents/simple-task-worker.toml`
+
+And for Gemini/Antigravity:
+
+- `~/.gemini/config/skills/execute-simple-task/`
+- `~/.gemini/config/agents/simple-task-worker.toml`
 
 Project-local installation:
 
@@ -159,10 +164,11 @@ Project-local installation:
 python scripts/install_worker.py --project
 ```
 
-This installs:
+This installs for both:
 
 - `.agents/skills/execute-simple-task/`
-- `.codex/agents/simple-task-worker.toml`
+- `.codex/agents/simple-task-worker.toml` (Codex)
+- `.agents/agents/simple-task-worker.toml` (Gemini/Antigravity)
 
 Use `--force` to replace an existing installation.
 

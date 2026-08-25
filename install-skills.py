@@ -37,7 +37,7 @@ SKILLS = (
 
 def choose_scope() -> bool:
     print("Install location:")
-    print("  1) User-wide (~/.agents/skills)")
+    print("  1) User-wide (~/.agents/skills and ~/.gemini/config/skills)")
     print("  2) Current project (.agents/skills)")
     choice = input("Choose [1]: ").strip().lower() or "1"
     if choice in {"1", "user", "user-wide"}:
@@ -81,17 +81,23 @@ def install_with_script(skill: Skill, project: bool) -> None:
 
 
 def install_by_copying(skill: Skill, project: bool) -> None:
-    destination_root = Path.cwd() if project else Path.home()
-    destination = destination_root / ".agents" / "skills" / skill.name
+    if project:
+        destinations = [Path.cwd() / ".agents" / "skills" / skill.name]
+    else:
+        destinations = [
+            Path.home() / ".agents" / "skills" / skill.name,
+            Path.home() / ".gemini" / "config" / "skills" / skill.name,
+        ]
 
-    if destination.is_dir():
-        shutil.rmtree(destination)
-    elif destination.exists():
-        destination.unlink()
+    for destination in destinations:
+        if destination.is_dir():
+            shutil.rmtree(destination)
+        elif destination.exists():
+            destination.unlink()
 
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(skill.source, destination)
-    print(f"Installed skill: {destination}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(skill.source, destination)
+        print(f"Installed skill: {destination}")
 
 
 def check_requirements(selected: list[Skill]) -> None:
@@ -107,7 +113,7 @@ def check_requirements(selected: list[Skill]) -> None:
 
 
 def main() -> int:
-    print("Install local Codex skills", flush=True)
+    print("Install local agent skills", flush=True)
     print("Only skills included in this repository can be selected.", flush=True)
 
     try:

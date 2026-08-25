@@ -58,7 +58,7 @@ Treat the worker output as structural evidence. The main agent remains responsib
 
 ## Agent configuration
 
-Codex resolves the `codegraph-analysis-worker` profile from its agent configuration. Change `model` or `model_reasoning_effort` in the installed TOML to configure capability and cost. The bundled default is Luna with high reasoning.
+The main agent resolves the `codegraph-analysis-worker` profile from its agent configuration. Change `model` or `model_reasoning_effort` in the installed TOML to configure capability and cost. The bundled default is Luna with high reasoning.
 
 Use `scripts/install_worker.py` to install the skill and bundled worker profile. Run it without arguments for user-wide installation, or pass `--project` to install into the current repository. Use `--force` to replace an existing installation.
 
