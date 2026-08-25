@@ -2,6 +2,19 @@
 
 Skills for Codex agents.
 
+## Install
+
+Run the interactive installer from the repository root:
+
+```sh
+python ./install-skills.py
+```
+
+It installs only the skills included in this repository. Choose a user-wide or
+current-project installation, then select one or more skills. Existing selected
+skills are replaced. The production skills use their own installers, including
+their worker profiles.
+
 ## Available skills
 
 ### `codegraph-analysis`
