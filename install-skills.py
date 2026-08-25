@@ -94,6 +94,18 @@ def install_by_copying(skill: Skill, project: bool) -> None:
     print(f"Installed skill: {destination}")
 
 
+def check_requirements(selected: list[Skill]) -> None:
+    if not any(skill.name == "codegraph-analysis" for skill in selected):
+        return
+    if shutil.which("codegraph"):
+        return
+
+    raise RuntimeError(
+        "codegraph-analysis requires the codegraph command. Install it with:\n"
+        "  npm i -g @colbymchenry/codegraph"
+    )
+
+
 def main() -> int:
     print("Install local Codex skills", flush=True)
     print("Only skills included in this repository can be selected.", flush=True)
@@ -101,10 +113,11 @@ def main() -> int:
     try:
         project = choose_scope()
         selected = choose_skills()
+        check_requirements(selected)
     except (EOFError, KeyboardInterrupt):
         print("\nCancelled.")
         return 1
-    except ValueError as error:
+    except (RuntimeError, ValueError) as error:
         print(error, file=sys.stderr)
         return 1
 

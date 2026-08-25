@@ -15,6 +15,18 @@ current-project installation, then select one or more skills. Existing selected
 skills are replaced. The production skills use their own installers, including
 their worker profiles.
 
+### CodeGraph requirement
+
+`codegraph-analysis` needs the `codegraph` command. Install it before selecting
+that skill in the installer:
+
+```sh
+npm i -g @colbymchenry/codegraph
+```
+
+The installer checks whether `codegraph` is available and stops with this
+command if it is not.
+
 ## Available skills
 
 ### `codegraph-analysis`
