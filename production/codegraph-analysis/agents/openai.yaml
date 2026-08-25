@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodeGraph Analysis"
+  short_description: "Delegate factual cross-file code tracing"
+  default_prompt: "Use $codegraph-analysis to trace how this behavior moves through the codebase."

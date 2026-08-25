@@ -1,0 +1,3 @@
+interface:
+  display_name: "Execute Simple Task"
+  short_description: "Delegate routine local tasks to a cheap worker"
