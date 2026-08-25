@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 from pathlib import Path
 
@@ -11,7 +12,7 @@ SKILL_NAME = "codegraph-analysis"
 WORKER_NAME = "codegraph-analysis-worker.toml"
 
 
-def copy_file(source: Path, destination: Path, force: bool) -> bool:
+def copy_file(source: Path, destination: Path, force: bool, is_gemini: bool = False) -> bool:
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     if destination.exists() and not force:
@@ -19,7 +20,12 @@ def copy_file(source: Path, destination: Path, force: bool) -> bool:
         print("Use --force to replace it.")
         return False
 
-    shutil.copy2(source, destination)
+    if is_gemini:
+        content = source.read_text(encoding="utf-8")
+        content = re.sub(r'model\s*=\s*".+"', 'model = "gemini-3.7-flash"', content)
+        destination.write_text(content, encoding="utf-8")
+    else:
+        shutil.copy2(source, destination)
     print(f"Installed worker: {destination}")
     return True
 
@@ -67,8 +73,8 @@ def main() -> int:
     if args.project:
         skill_destinations = [Path.cwd() / ".agents" / "skills" / SKILL_NAME]
         worker_destinations = [
-            Path.cwd() / ".codex" / "agents" / WORKER_NAME,
-            Path.cwd() / ".agents" / "agents" / WORKER_NAME,
+            (Path.cwd() / ".codex" / "agents" / WORKER_NAME, False),
+            (Path.cwd() / ".agents" / "agents" / WORKER_NAME, True),
         ]
     else:
         skill_destinations = [
@@ -76,8 +82,8 @@ def main() -> int:
             Path.home() / ".gemini" / "config" / "skills" / SKILL_NAME,
         ]
         worker_destinations = [
-            Path.home() / ".codex" / "agents" / WORKER_NAME,
-            Path.home() / ".gemini" / "config" / "agents" / WORKER_NAME,
+            (Path.home() / ".codex" / "agents" / WORKER_NAME, False),
+            (Path.home() / ".gemini" / "config" / "agents" / WORKER_NAME, True),
         ]
 
     for dest in skill_destinations:
@@ -86,7 +92,7 @@ def main() -> int:
             print("Use --force to replace existing files.")
             return 2
 
-    for dest in worker_destinations:
+    for dest, is_gemini in worker_destinations:
         if dest.exists() and not args.force:
             print(f"Not overwritten: {dest}")
             print("Use --force to replace existing files.")
@@ -96,8 +102,8 @@ def main() -> int:
         if not copy_skill(skill_root, dest, args.force):
             return 2
 
-    for dest in worker_destinations:
-        if not copy_file(worker_source, dest, args.force):
+    for dest, is_gemini in worker_destinations:
+        if not copy_file(worker_source, dest, args.force, is_gemini):
             return 2
 
     print("Installation complete.")
@@ -105,7 +111,7 @@ def main() -> int:
     for dest in skill_destinations:
         print(f"  {dest}")
     print("Workers installed to:")
-    for dest in worker_destinations:
+    for dest, is_gemini in worker_destinations:
         print(f"  {dest}")
     print("Edit model and model_reasoning_effort in the worker TOML to change the worker model.")
     return 0
