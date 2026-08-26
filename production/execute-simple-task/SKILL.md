@@ -140,6 +140,8 @@ Preserve explicit error messages exactly in the returned result.
 
 The worker model is intentionally not configured in this skill. The main agent resolves the custom agent named `simple-task-worker` from its agent configuration.
 
+The bundled worker profile omits `sandbox_mode` so Codex inherits the parent session's active permissions. Keep that setting inherited. A fixed `workspace-write` override can discard parent read grants that Windows build tools need for SDK metadata outside the repository.
+
 Use `scripts/install_worker.py` to install both this skill and the bundled worker profile.
 
 User-wide installation:
@@ -171,6 +173,8 @@ This installs for both:
 - `.agents/agents/simple-task-worker.toml` (Gemini/Antigravity)
 
 Use `--force` to replace an existing installation.
+
+Use a forced reinstall when upgrading an older installation whose worker profile contains an explicit `sandbox_mode` setting.
 
 Change the `model` and `model_reasoning_effort` values in the installed worker TOML to switch worker cost or capability without editing this skill.
 
