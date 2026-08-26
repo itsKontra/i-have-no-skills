@@ -2,6 +2,7 @@ name = "simple-task-worker"
 description = "Low-cost worker for bounded shell, build, test, git, and log-inspection tasks that need little judgment."
 model = "gpt-5.6-luna"
 model_reasoning_effort = "low"
+default_permissions = "simple-task-worker"
 
 developer_instructions = """
 Execute only the bounded task given by the parent agent.
@@ -23,3 +24,10 @@ raw: Return command stdout unchanged. Add no prose, headings, code fences, trunc
 Prefer direct file paths and targeted shell commands. Do not read unrelated project files or gather broad context without a concrete need.
 Do not spawn more agents.
 """
+
+[permissions.simple-task-worker]
+description = "Workspace writes with full filesystem read access for build and test tooling."
+extends = ":workspace"
+
+[permissions.simple-task-worker.filesystem]
+":root" = "read"

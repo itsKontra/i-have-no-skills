@@ -140,7 +140,7 @@ Preserve explicit error messages exactly in the returned result.
 
 The worker model is intentionally not configured in this skill. The main agent resolves the custom agent named `simple-task-worker` from its agent configuration.
 
-The bundled worker profile omits `sandbox_mode` so Codex inherits the parent session's active permissions. Keep that setting inherited. A fixed `workspace-write` override can discard parent read grants that Windows build tools need for SDK metadata outside the repository.
+The bundled worker uses a permission profile that keeps workspace write access and grants read access to the full filesystem. Build tools need to read SDK, package-manager, and user-level configuration outside the repository.
 
 Use `scripts/install_worker.py` to install both this skill and the bundled worker profile.
 
@@ -174,7 +174,7 @@ This installs for both:
 
 Use `--force` to replace an existing installation.
 
-Use a forced reinstall when upgrading an older installation whose worker profile contains an explicit `sandbox_mode` setting.
+Use a forced reinstall to apply worker profile updates.
 
 Change the `model` and `model_reasoning_effort` values in the installed worker TOML to switch worker cost or capability without editing this skill.
 
