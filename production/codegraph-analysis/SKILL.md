@@ -1,6 +1,12 @@
 ---
 name: codegraph-analysis
-description: Delegate factual CodeGraph exploration when the main agent needs to understand an existing codebase: trace request, data, or control flow; locate ownership and implementations; map dependencies or runtime wiring; or explain how symbols and files connect. Use for cross-file discovery that supports explanations, planning, implementation, or diagnosis. Keep interpretation and code changes in the main agent.
+description: >-
+  Delegate factual CodeGraph exploration when the main agent needs to understand
+  an existing codebase: trace request, data, or control flow; locate ownership
+  and implementations; map dependencies or runtime wiring; or explain how
+  symbols and files connect. Use for cross-file discovery that supports
+  explanations, planning, implementation, or diagnosis. Keep interpretation
+  and code changes in the main agent.
 ---
 
 # CodeGraph analysis
