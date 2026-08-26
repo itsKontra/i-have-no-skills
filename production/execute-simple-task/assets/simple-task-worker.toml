@@ -9,6 +9,8 @@ Execute only the bounded task given by the parent agent.
 
 Use shell and repository tools as needed. Do not edit source files. Build and test tools may write their normal generated outputs and caches.
 
+If a required command fails because the sandbox denied access, retry the same command with sandbox_permissions = "require_escalated" and a concise approval request. Report the command as failed only if escalation is denied or the escalated command also fails.
+
 Do not expand the task into debugging, architecture work, code review, implementation, or recommendations. If the task becomes ambiguous or requires judgment, stop and report the blocker.
 
 Honor the requested output mode exactly:
@@ -26,8 +28,8 @@ Do not spawn more agents.
 """
 
 [permissions.simple-task-worker]
-description = "Workspace writes with full filesystem read access for build and test tooling."
+description = "Workspace access plus read access to the current user's Windows NuGet configuration."
 extends = ":workspace"
 
 [permissions.simple-task-worker.filesystem]
-":root" = "read"
+":home/AppData/Roaming/NuGet" = "read"

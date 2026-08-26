@@ -124,6 +124,8 @@ If a ref is missing or ambiguous, report that instead of guessing another ref.
 
 Use the repository's documented or obvious standard command. If several build systems are present and the correct command is not clear, do not guess. Return that the task is not simple enough for this skill.
 
+If a required command fails with a sandbox-related access or permission error, retry it with `sandbox_permissions = "require_escalated"` and a concise approval request. A sandbox denial before compilation or test execution is not a repository failure. Report `FAILED` only if escalation is denied or the escalated command also fails.
+
 Do not edit source files to make a build or test pass.
 
 Build tools may create normal generated output such as `bin`, `obj`, `target`, or build caches. Do not treat those as source edits.
@@ -140,7 +142,7 @@ Preserve explicit error messages exactly in the returned result.
 
 The worker model is intentionally not configured in this skill. The main agent resolves the custom agent named `simple-task-worker` from its agent configuration.
 
-The bundled worker uses a permission profile that keeps workspace write access and grants read access to the full filesystem. Build tools need to read SDK, package-manager, and user-level configuration outside the repository.
+The bundled worker profile extends `:workspace`, which keeps workspace read and write access. It also grants read access to `:home/AppData/Roaming/NuGet` for user-level NuGet configuration on Windows. Other protected paths require an escalation retry when a command needs them.
 
 Use `scripts/install_worker.py` to install both this skill and the bundled worker profile.
 
