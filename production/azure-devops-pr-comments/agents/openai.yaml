@@ -1,0 +1,4 @@
+interface:
+  display_name: "Azure DevOps PR Comments"
+  short_description: "Manage Azure DevOps pull request comments"
+  default_prompt: "Use $azure-devops-pr-comments to list comments on the active pull request for my current branch."

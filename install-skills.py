@@ -21,6 +21,7 @@ class Skill:
 
 
 SKILLS = (
+    Skill("azure-devops-pr-comments", ROOT / "production" / "azure-devops-pr-comments"),
     Skill(
         "codegraph-analysis",
         ROOT / "production" / "codegraph-analysis",

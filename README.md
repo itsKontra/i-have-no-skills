@@ -29,6 +29,12 @@ command if it is not.
 
 ## Available skills
 
+### `azure-devops-pr-comments`
+
+Lists and manages comment threads on the active Azure DevOps pull request for a branch. It reads organization, project, repository, and personal access token values from a local environment file.
+
+Location: [`production/azure-devops-pr-comments`](production/azure-devops-pr-comments/)
+
 ### `codegraph-analysis`
 
 Delegates a focused CodeGraph exploration to a worker agent. Use it to trace code paths, locate implementations, and map how files and symbols connect. It gathers factual context only and leaves design decisions and edits to the main agent.
