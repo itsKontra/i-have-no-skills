@@ -1,7 +1,7 @@
 ---
 name: codegraph-analysis
 description: >-
-  Delegate factual CodeGraph exploration when the main agent needs to understand
+  Delegate factual CodeGraph exploration to the shared simple-task worker when the main agent needs to understand
   an existing codebase: trace request, data, or control flow; locate ownership
   and implementations; map dependencies or runtime wiring; or explain how
   symbols and files connect. Use for cross-file discovery that supports
@@ -11,7 +11,7 @@ description: >-
 
 # CodeGraph analysis
 
-Delegate one bounded code-understanding question to the custom agent named `codegraph-analysis-worker`.
+Delegate one bounded code-understanding question to the custom agent named `simple-task-worker`.
 
 The worker reconstructs existing behavior. It does not review the code, judge the design, propose improvements, or edit source files.
 
@@ -30,7 +30,7 @@ Handle a lookup directly when the answer is already in context or only requires 
 ## Workflow
 
 1. Form one concrete exploration question. Include named endpoints or symbols when known.
-2. Spawn exactly one `codegraph-analysis-worker` with `fork_context: false`. Do not pass message history.
+2. Spawn exactly one `simple-task-worker` with `fork_context: false`. Do not pass message history. Request `analysis` output mode.
 3. Give it only the repository root, the exploration question, relevant symbol or file anchors, and any explicit output request.
 4. Wait for its result. Reuse the same worker for a closely related follow-up instead of spawning another one.
 5. Use the returned evidence in the main task. Do not repeat the exploration unless the worker reports stale, missing, or ambiguous index data.
@@ -42,6 +42,7 @@ Use a compact prompt with these fields when known:
 ```text
 Task: <one factual codebase question>
 Repository root: <absolute path>
+Output mode: analysis
 Anchors: <symbols, files, projects, or endpoints>
 Requested detail: <summary, call path, ownership map, or other factual result>
 Full files requested: <none by default, or exact files explicitly requested by the user>
@@ -64,8 +65,8 @@ Treat the worker output as structural evidence. The main agent remains responsib
 
 ## Agent configuration
 
-The main agent resolves the `codegraph-analysis-worker` profile from its agent configuration. Change `model` or `model_reasoning_effort` in the installed TOML to configure capability and cost. The bundled default is Luna with high reasoning.
+The main agent resolves the shared `simple-task-worker` profile from its agent configuration. Change `model` or `model_reasoning_effort` in the installed TOML to configure capability and cost. The bundled default is Luna with medium reasoning.
 
-Use `scripts/install_worker.py` to install the skill and bundled worker profile. Run it without arguments for user-wide installation, or pass `--project` to install into the current repository. Use `--force` to replace an existing installation.
+Use `scripts/install_worker.py` to install the skill and the shared worker profile from `execute-simple-task`. Run it without arguments for user-wide installation, or pass `--project` to install into the current repository. Use `--force` to replace an existing installation.
 
-If `codegraph-analysis-worker` is unavailable, report that the worker profile must be installed or enabled. Do not silently substitute a history-forking agent.
+If `simple-task-worker` is unavailable, report that the worker profile must be installed or enabled. Do not silently substitute a history-forking agent.

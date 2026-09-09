@@ -37,13 +37,13 @@ Location: [`production/azure-devops-pr-comments`](production/azure-devops-pr-com
 
 ### `codegraph-analysis`
 
-Delegates a focused CodeGraph exploration to a worker agent. Use it to trace code paths, locate implementations, and map how files and symbols connect. It gathers factual context only and leaves design decisions and edits to the main agent.
+Delegates a focused CodeGraph exploration to the shared `simple-task-worker`. Use it to trace code paths, locate implementations, and map how files and symbols connect. It gathers factual context only and leaves design decisions and edits to the main agent.
 
 Location: [`production/codegraph-analysis`](production/codegraph-analysis/)
 
 ### `execute-simple-task`
 
-Delegates one small, mechanical repository task to a worker agent. It is for jobs such as running a build or test, collecting a Git diff, checking a command, or summarizing a log. It is not for implementation, review, or ambiguous debugging.
+Delegates routine repository work to `simple-task-worker`. It is the preferred route for builds, tests, factual CodeGraph analysis, Git diffs, commands, and log summaries. Related checks can run together in one worker task. It is not for implementation, review, or ambiguous debugging.
 
 Location: [`production/execute-simple-task`](production/execute-simple-task/)
 

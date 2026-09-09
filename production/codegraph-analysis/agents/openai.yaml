@@ -1,4 +1,4 @@
 interface:
   display_name: "CodeGraph Analysis"
-  short_description: "Delegate factual cross-file code tracing"
+  short_description: "Delegate CodeGraph tracing to the simple task worker"
   default_prompt: "Use $codegraph-analysis to trace how this behavior moves through the codebase."

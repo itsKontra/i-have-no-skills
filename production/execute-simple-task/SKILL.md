@@ -1,22 +1,23 @@
 ---
 name: execute-simple-task
-description: Delegate small, mechanical local development tasks to a low-cost Codex subagent and return only the requested result. Use for bounded shell or repository work such as building a project, running tests, collecting a git diff, checking command status, or summarizing a log file when the task needs little judgment. Do not use for architecture, implementation, ambiguous debugging, security review, design decisions, or other work that needs substantial reasoning.
+description: Delegate routine local development work to a low-cost Codex subagent and return only the requested result. Prefer this skill for builds, tests, factual CodeGraph analysis, command execution, Git diffs, and log inspection. Batch related mechanical commands into one delegation. Keep architecture, implementation, ambiguous debugging, security review, and design decisions in the main agent.
 ---
 
 # Execute simple task
 
-Delegate one bounded task to the custom Codex agent named `simple-task-worker`.
+Delegate routine work to the custom Codex agent named `simple-task-worker`.
 
 The purpose is to keep command noise, large logs, and routine inspection out of the parent thread while using a cheaper worker model.
 
 ## Workflow
 
-1. Confirm the request is mechanical and has a clear success condition.
-2. Choose one output mode from `status`, `errors`, `summary`, or `raw`.
-3. Spawn exactly one `simple-task-worker` subagent for the task.
-4. Pass only the context required to execute the task. Prefer paths, refs, commands, and explicit constraints over copied file contents or conversation history.
-5. Wait for the worker result.
-6. Return only the requested result. Do not redo the worker's task in the parent thread.
+1. Prefer delegation when a worker can run the request without making product or implementation decisions.
+2. Combine related builds, test runs, or other mechanical checks into one task when they share a repository and reporting goal.
+3. Choose one output mode from `status`, `errors`, `summary`, `analysis`, or `raw`.
+4. Spawn exactly one `simple-task-worker` subagent for the task.
+5. Pass only the context required to execute the task. Prefer paths, refs, commands, and explicit constraints over copied file contents or conversation history.
+6. Wait for the worker result.
+7. Return only the requested result. Do not redo the worker's task in the parent thread.
 
 Do not inspect large logs, diffs, build output, or test output in the parent before delegating unless the worker cannot access the source directly.
 
@@ -24,8 +25,10 @@ Do not inspect large logs, diffs, build output, or test output in the parent bef
 
 Delegate tasks such as:
 
-- build the current project
-- run a specified unit test suite
+- build one project, every project, or a solution
+- run one test suite or all relevant test projects
+- run a related build-and-test sequence in one worker task, such as `dotnet build` followed by `dotnet test` for all projects
+- answer a factual CodeGraph question about symbols, callers, implementations, ownership, dependencies, or runtime wiring
 - run a known command and report whether it succeeded
 - get the git diff between two named refs
 - summarize a named log file
@@ -48,9 +51,9 @@ If a mechanical task exposes a deeper problem, return the evidence to the parent
 Give the worker a compact prompt with these fields when they are known:
 
 ```text
-Task: <one bounded action>
+Task: <one bounded action or related command group>
 Working directory: <path>
-Output mode: <status|errors|summary|raw>
+Output mode: <status|errors|summary|analysis|raw>
 Inputs: <paths, refs, test names, or command constraints>
 Success condition: <what counts as done>
 Do not: <task-specific exclusions>
@@ -101,6 +104,12 @@ Return a short factual summary followed by exact error messages that matter. Inc
 
 Do not invent a root cause. If the evidence does not establish one, say that the cause is not established.
 
+### analysis
+
+Use for factual CodeGraph exploration. Return a compact explanation with clickable absolute file links and one-based line references. Report call paths, ownership, dependencies, or runtime wiring supported by the index. Distinguish CodeGraph output from inference and state unresolved ambiguity.
+
+Do not review the design, recommend changes, or paste long source files unless the user explicitly requested them.
+
 ### raw
 
 Use when the caller requests exact command output, especially git diffs.
@@ -124,11 +133,19 @@ If a ref is missing or ambiguous, report that instead of guessing another ref.
 
 Use the repository's documented or obvious standard command. If several build systems are present and the correct command is not clear, do not guess. Return that the task is not simple enough for this skill.
 
+Batch related build and test commands into one worker task when this avoids multiple delegations and preserves a clear result. Run them in an order that makes failures useful. For example, build before testing when the test command would otherwise repeat or obscure compilation failures. Report which command failed.
+
 If a required command fails with a sandbox-related access or permission error, retry it with `sandbox_permissions = "require_escalated"` and a concise approval request. A sandbox denial before compilation or test execution is not a repository failure. Report `FAILED` only if escalation is denied or the escalated command also fails.
 
 Do not edit source files to make a build or test pass.
 
 Build tools may create normal generated output such as `bin`, `obj`, `target`, or build caches. Do not treat those as source edits.
+
+## CodeGraph rules
+
+Use CodeGraph before grep, file search, or broad file reads when a `.codegraph/` directory exists at the repository root. Use the CodeGraph MCP exploration tool when available, otherwise run `codegraph explore` from the repository root.
+
+Start with one query that names the factual question and known symbols or files. Use narrow follow-up queries only when the first result leaves a material gap. If the repository has no `.codegraph/` directory, report that CodeGraph analysis is unavailable. Do not initialize an index unless the parent explicitly asks for it.
 
 ## Log rules
 

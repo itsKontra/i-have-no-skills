@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the codegraph-analysis skill and its Codex worker profile."""
+"""Install the codegraph-analysis skill and shared simple-task worker profile."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 
 SKILL_NAME = "codegraph-analysis"
-WORKER_NAME = "codegraph-analysis-worker.toml"
+WORKER_NAME = "simple-task-worker.toml"
 
 
 def copy_file(source: Path, destination: Path, force: bool, is_gemini: bool = False) -> bool:
